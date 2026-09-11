@@ -124,8 +124,6 @@ User can register with email, password, and role (employee/admin/owner).
 
 Password must meet security requirements (min length, complexity).
 
-Confirmation email sent after registration.
-
 📦 Create (Add Product)
 User Story: As an administrator, I want to add new products so they can be tracked in the system.
 
@@ -146,8 +144,6 @@ Inventory list displays product name, SKU, quantity, and status (in stock, low s
 
 Search and filter options available.
 
-Pagination for large datasets.
-
 ✏️ Update (Edit Product)
 User Story: As an administrator, I want to update product details so inventory stays accurate.
 
@@ -157,8 +153,6 @@ Editable fields: name, category, quantity, price.
 
 Changes saved and reflected immediately.
 
-Audit log records updates.
-
 🗑️ Delete (Remove Product)
 User Story: As an administrator, I want to delete products so outdated items are removed.
 
@@ -167,8 +161,6 @@ Acceptance Criteria:
 Delete action requires confirmation.
 
 Deleted products no longer appear in inventory list.
-
-Audit log records deletion.
 
 4. API Endpoints
 Endpoint	Method	Description
