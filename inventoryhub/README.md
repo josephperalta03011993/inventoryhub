@@ -16,3 +16,82 @@ Create, Read, Update, and Delete (CRUD) inventory items
 Stock quantity tracking and updates
 User management for Admins
 Inventory dashboard and summary reports for Owners
+
+## PROJECT SPECIFICATION
+Governing Principles for InventoryHub
+
+1. TypeScript Standards
+Strict mode enabled ("strict": true in tsconfig.json).
+
+No use of any; prefer unknown, generics, or discriminated unions.
+
+Strong typing for API responses, props, and state.
+
+Utility types (Partial, Pick, Omit) used for clarity, not shortcuts.
+
+Consistent use of interface for contracts and type for unions.
+
+2. Tailwind CSS Conventions
+Utility-first approach: styling via Tailwind classes, not custom CSS.
+
+Avoid @apply unless for reusable component patterns.
+
+No custom CSS unless Tailwind cannot achieve the design.
+
+Use Tailwind configuration (tailwind.config.js) for theme extensions (colors, spacing, typography).
+
+Responsive design via Tailwind’s breakpoint utilities (sm:, md:, lg:).
+
+3. Next.js Patterns
+App Router: use app/ directory with file-based routing.
+
+Server Components: default to server components for data fetching and rendering.
+
+Client Components: only when interactivity or hooks (useState, useEffect) are required.
+
+Data fetching: prefer fetch in server components; use caching and revalidation (revalidate).
+
+API routes: colocated in app/api/ with proper typing.
+
+Error handling: use error.tsx and loading.tsx conventions.
+
+4. Testing Expectations
+Unit tests with Jest and React Testing Library.
+
+Integration tests for API routes and database interactions.
+
+End-to-end tests with Playwright or Cypress.
+
+80% minimum coverage enforced via CI.
+
+Snapshot testing for UI components.
+
+Mocking external services (e.g., database, APIs).
+
+5. Naming Conventions
+Files & folders: kebab-case (inventory-list.tsx).
+
+Components: PascalCase (InventoryCard.tsx).
+
+Variables & functions: camelCase (updateStockLevel).
+
+Types & interfaces: PascalCase with Props or Type suffix (InventoryItemProps).
+
+Constants: UPPER_SNAKE_CASE (MAX_STOCK_LIMIT).
+
+Tests: mirror file structure with .test.tsx suffix.
+
+6. Team Collaboration Guidelines
+Git workflow: feature branches → pull requests → code review → merge.
+
+Commit messages: Conventional Commits (feat:, fix:, chore:).
+
+Code reviews: mandatory for all merges; focus on readability, maintainability, and adherence to standards.
+
+Documentation: inline JSDoc for complex functions; README updates for major changes.
+
+Agile practices: sprint planning, daily standups, retrospectives.
+
+Knowledge sharing: regular demos, pair programming encouraged.
+
+CI/CD: automated linting, testing, and deployment pipelines.
