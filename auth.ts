@@ -44,7 +44,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ],
   callbacks: {
     //Inject the user's database role directly into the JWT token
-    async jwt({ token, user }) {
+    async jwt({ token, user}) {
       if (user) {
         token.role = user.role;
       }
