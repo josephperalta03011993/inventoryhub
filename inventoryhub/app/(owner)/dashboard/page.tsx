@@ -1,7 +1,11 @@
-"use client";
-
+import type { Metadata } from "next";
 import { getProducts, getLowStockProducts, getTotalStockValue } from "@/lib/owner-mock-data";
 import { SummaryCard, ReportLink, Th, Td, PageHeader } from "@/components/owner/OwnerUI";
+
+export const metadata: Metadata = {
+  title: "Owner Dashboard",
+  description: "The official dashboard for ownership to manage reports on the store.",
+};
 
 export default function OwnerDashboardPage() {
   const products = getProducts();
