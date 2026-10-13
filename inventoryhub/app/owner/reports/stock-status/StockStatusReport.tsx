@@ -23,13 +23,13 @@ export default function StockStatusReport({
   }));
 
   return (
-    <main className="min-h-screen bg-white text-black px-8 py-10">
+    <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900 md:px-8 md:py-10">
       <PageHeader
         title="Stock Status"
         description="Overall stock levels and total inventory value across all products."
       />
 
-      <section className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
         <SummaryCard label="Total Products" value={products.length} />
         <SummaryCard label="Total Stock Value" value={formatCurrency(totalStockValue)} />
         <SummaryCard label="Below Restock Level" value={lowStockCount} />
@@ -39,10 +39,10 @@ export default function StockStatusReport({
         <ExportCsvButton data={exportRows} filename="stock-status-report.csv" />
       </div>
 
-      <div className="border border-[#E5E5E5] rounded-md overflow-hidden">
-        <table className="w-full border-collapse">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table className="w-full min-w-[760px] border-collapse">
           <thead>
-            <tr className="bg-white">
+            <tr>
               <Th>Product</Th>
               <Th>SKU</Th>
               <Th>Quantity</Th>
@@ -55,16 +55,16 @@ export default function StockStatusReport({
           <tbody>
             {products.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-3 text-sm text-center border-t border-[#E5E5E5]">
+                <td colSpan={6} className="border-t border-slate-100 px-4 py-6 text-center text-sm text-slate-500">
                   No products have been added yet.
                 </td>
               </tr>
             ) : (
               products.map((p) => (
-                <tr key={p.id} className="border-t border-[#E5E5E5]">
+                <tr key={p.id} className="border-t border-slate-100">
                   <Td>{p.name}</Td>
                   <Td>{p.sku}</Td>
-                  <Td className={p.isLowStock ? "text-red-800 font-medium" : ""}>{p.quantity}</Td>
+                  <Td className={p.isLowStock ? "font-medium text-red-700" : ""}>{p.quantity}</Td>
                   <Td>{p.restockLevel}</Td>
                   <Td>{formatCurrency(p.price)}</Td>
                   <Td>{formatCurrency(p.quantity * p.price)}</Td>

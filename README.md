@@ -1,6 +1,6 @@
 InventoryHub
 
-InventoryHub is a web-based inventory management system designed for small businesses and organizations to track products and stock levels efficiently. The system allows employees to update inventory records, administrators to manage products and users, and owners to monitor inventory status and reports. It helps improve inventory accuracy and reduce manual record-keeping.
+InventoryHub is a web-based inventory management system designed for small businesses and organizations to track products and stock levels efficiently. Employees can view product and stock information, administrators can manage products and users, and owners can monitor inventory status and reports. It helps improve inventory accuracy and reduce manual record-keeping.
 
 Problem: Many small businesses still manage inventory using spreadsheets or paper records, making it difficult to track stock levels accurately and efficiently.
 
@@ -81,6 +81,9 @@ CREATE TABLE inventory_transactions (
   reason             TEXT,
   created_at         TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+For an existing database, run `./inventoryhub/database/migrations/001_inventory_transactions.sql` in the Neon SQL Editor. It creates the transaction-history table and indexes if needed, and records current product quantities as opening balances. It does not reconstruct stock changes made before the migration.
+
 3. Configure environment variables
 
 Create a file named .env.local in the project root (it is git-ignored):
@@ -113,7 +116,7 @@ API Routes
 Route	Method	Request body	Success response	Errors
 /api/auth/signup	POST	{ name, email, password }	201 account created (role is always Employee)	400 invalid input, 409 email already registered
 /api/auth/login	POST	{ email, password }	200 and sets the inventory_session cookie (2-hour expiry)	400 invalid input, 401 invalid credentials
-[logout route]	[method]			
+/api/auth/logout	POST	—	200 and clears the inventory_session cookie	—
 
 The original specification proposed REST endpoints under /api/products and /api/reports. In the implemented app, products, users, and reports are read in server components and changed through Server Actions, so the only route handlers are the authentication routes above.
 
@@ -135,7 +138,7 @@ Product Demo
 
 The problem. Small shops and warehouse teams often track stock in spreadsheets or on paper. Counts drift, nobody knows who changed what, and low stock is discovered only after a customer is turned away. InventoryHub gives a team one shared, always-current record of what is on hand and a log of every stock change.
 
-The users. The app serves three kinds of people. Employees record and update products and stock. Admins manage the product catalog and staff accounts. Owners review the business: how much stock value is on hand, which items need restocking, and who made which change and when.
+The users. The app serves three kinds of people. Employees view products and stock information. Admins manage the product catalog and staff accounts. Owners review the business: how much stock value is on hand, which items need restocking, and who made which change and when.
 
 The key flow. An owner signs in and lands on the dashboard, sees the low-stock count and total stock value at a glance, and opens the Low Stock report to decide what to reorder. From the Transaction History report they can filter by date range and employee to audit changes. The value is fewer stockouts, accountability for every adjustment, and decisions based on live data instead of guesswork.
 

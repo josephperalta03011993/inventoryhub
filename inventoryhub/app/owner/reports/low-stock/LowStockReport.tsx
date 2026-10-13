@@ -28,7 +28,7 @@ export default function LowStockReport({
   }));
 
   return (
-    <main className="min-h-screen bg-white text-black px-8 py-10">
+    <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900 md:px-8 md:py-10">
       <PageHeader
         title="Low Stock Alerts"
         description="All products currently below their restock threshold."
@@ -41,15 +41,15 @@ export default function LowStockReport({
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name or SKU..."
           aria-label="Search low stock products"
-          className="w-full max-w-xs border border-[#E5E5E5] rounded-md px-3 py-1.5 text-sm"
+          className="w-full max-w-xs rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
         />
         <ExportCsvButton data={exportRows} filename="low-stock-report.csv" />
       </div>
 
-      <div className="border border-[#E5E5E5] rounded-md overflow-hidden">
-        <table className="w-full border-collapse">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table className="w-full min-w-[640px] border-collapse">
           <thead>
-            <tr className="bg-white">
+            <tr>
               <Th>Product</Th>
               <Th>SKU</Th>
               <Th>Quantity</Th>
@@ -61,7 +61,7 @@ export default function LowStockReport({
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-3 text-sm text-center border-t border-[#E5E5E5]">
+                <td colSpan={5} className="border-t border-slate-100 px-4 py-6 text-center text-sm text-slate-500">
                   {lowStockProducts.length === 0
                     ? "No products are currently below restock level."
                     : "No products match your search."}
@@ -69,10 +69,10 @@ export default function LowStockReport({
               </tr>
             ) : (
               filtered.map((p) => (
-                <tr key={p.id} className="border-t border-[#E5E5E5]">
+                <tr key={p.id} className="border-t border-slate-100">
                   <Td>{p.name}</Td>
                   <Td>{p.sku}</Td>
-                  <Td className="text-red-800 font-medium">{p.quantity}</Td>
+                  <Td className="font-medium text-red-700">{p.quantity}</Td>
                   <Td>{p.restockLevel}</Td>
                   <Td>{p.restockLevel - p.quantity}</Td>
                 </tr>

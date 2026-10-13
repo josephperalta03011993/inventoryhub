@@ -55,6 +55,18 @@ export type Employee = {
   name: string;
 };
 
+export type EmployeeDirectoryEntry = Employee & {
+  email: string;
+  createdAt: string;
+};
+
+export class TransactionHistoryNotConfiguredError extends Error {
+  constructor() {
+    super("The inventory_transactions table has not been created.");
+    this.name = "TransactionHistoryNotConfiguredError";
+  }
+}
+
 const displayTimeFormat = new Intl.DateTimeFormat("en-PH", {
   timeZone: STORE_TIME_ZONE,
   dateStyle: "medium",
@@ -114,29 +126,66 @@ export async function getEmployees(): Promise<Employee[]> {
   return rows.map((row) => ({ id: String(row.id), name: row.name }));
 }
 
+export async function getEmployeeDirectory(): Promise<EmployeeDirectoryEntry[]> {
+  const rows = await sql`
+    SELECT id, name, email, created_at
+    FROM public.users
+    WHERE role = 'Employee'
+    ORDER BY name ASC
+  `;
+
+  return rows.map((row) => ({
+    id: String(row.id),
+    name: String(row.name),
+    email: String(row.email),
+    createdAt: new Date(row.created_at).toLocaleDateString("en-PH", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: "Asia/Manila",
+    }),
+  }));
+}
+
 export async function getTransactions(filters: TransactionFilters): Promise<Transaction[]> {
   const employeeId = filters.employeeId || null;
 
-  const rows = await sql`
-    SELECT
-      t.id,
-      p.name AS product_name,
-      p.sku,
-      t.transaction_type,
-      t.previous_quantity,
-      t.new_quantity,
-      t.quantity_change,
-      t.reason,
-      u.name AS employee_name,
-      t.created_at
-    FROM inventory_transactions t
-    LEFT JOIN products p ON p.id = t.product_id
-    LEFT JOIN users u ON u.id = t.user_id
-    WHERE (t.created_at AT TIME ZONE ${STORE_TIME_ZONE}::text)::date
-            BETWEEN ${filters.startDate}::date AND ${filters.endDate}::date
-      AND (${employeeId}::text IS NULL OR t.user_id::text = ${employeeId}::text)
-    ORDER BY t.created_at DESC
-  `;
+  let rows;
+  try {
+    rows = await sql`
+      SELECT
+        t.id,
+        p.name AS product_name,
+        p.sku,
+        t.transaction_type,
+        t.previous_quantity,
+        t.new_quantity,
+        t.quantity_change,
+        t.reason,
+        u.name AS employee_name,
+        t.created_at
+      FROM inventory_transactions t
+      LEFT JOIN products p ON p.id = t.product_id
+      LEFT JOIN users u ON u.id = t.user_id
+      WHERE (t.created_at AT TIME ZONE ${STORE_TIME_ZONE}::text)::date
+              BETWEEN ${filters.startDate}::date AND ${filters.endDate}::date
+        AND (${employeeId}::text IS NULL OR t.user_id::text = ${employeeId}::text)
+      ORDER BY t.created_at DESC
+    `;
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "42P01" &&
+      "message" in error &&
+      typeof error.message === "string" &&
+      error.message.includes('"inventory_transactions"')
+    ) {
+      throw new TransactionHistoryNotConfiguredError();
+    }
+    throw error;
+  }
 
   return rows.map((row) => {
     const createdAt = new Date(row.created_at);

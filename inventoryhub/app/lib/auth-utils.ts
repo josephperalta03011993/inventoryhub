@@ -7,6 +7,14 @@ export interface UserSessionPayload {
   role: 'Employee' | 'Admin' | 'Owner';
 }
 
+export const UserRoleSchema = z.enum(['Employee', 'Admin', 'Owner']);
+
+const UserSessionPayloadSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  role: UserRoleSchema,
+});
+
 export const LoginSchema = z.object({
   email: z.string().email({ message: 'Please provide a valid business email address.' }),
   password: z.string().min(4, { message: 'Password must be at least 4 characters long.' }),
@@ -19,13 +27,13 @@ export const SignUpSchema = z.object({
   role: z.enum(['Employee', 'Admin', 'Owner']),
 });
 
-const jwtSecret = process.env.JWT_SECRET;
-
-if (!jwtSecret) {
-  throw new Error('JWT_SECRET environment variable is not set');
+function getJwtSecretKey(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error('JWT_SECRET must be configured with at least 32 characters.');
+  }
+  return new TextEncoder().encode(secret);
 }
-
-const JWT_SECRET_KEY = new TextEncoder().encode(jwtSecret);
 
 export async function hashPassword(password: string): Promise<string> {
   const msgUint8 = new TextEncoder().encode(password);
@@ -39,14 +47,15 @@ export async function signSessionToken(payload: UserSessionPayload): Promise<str
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('2h')
-    .sign(JWT_SECRET_KEY);
+    .sign(getJwtSecretKey());
 }
 
 export async function verifySessionToken(token: string): Promise<UserSessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET_KEY, { algorithms: ['HS256'] });
-    return payload as unknown as UserSessionPayload;
-  } catch (error) {
+    const { payload } = await jwtVerify(token, getJwtSecretKey(), { algorithms: ['HS256'] });
+    const result = UserSessionPayloadSchema.safeParse(payload);
+    return result.success ? result.data : null;
+  } catch {
     return null;
   }
 }

@@ -1,6 +1,7 @@
 import { sql } from "@/app/lib/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { requireRole } from "@/app/lib/session";
 
 type User = {
   id: string;
@@ -16,6 +17,7 @@ export default async function UserPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireRole("Admin");
   const { id } = await params;
 
   const result = await sql`

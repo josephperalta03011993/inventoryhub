@@ -1,7 +1,20 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/app/lib/session";
 
-export default function HomePage() {
+export default async function Home() {
+  const user = await getCurrentUser();
+
+  if (user?.role === "Owner") {
+    redirect("/owner/dashboard");
+  }
+
+  if (user) {
+    redirect("/products");
+  }
+
   return (
+<<<<<<< HEAD
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-6 py-16">
       <p className="text-sm font-black uppercase tracking-widest text-black">
         InventoryHub
@@ -29,27 +42,26 @@ export default function HomePage() {
           Create an account
         </Link> */}
       </div>
-
-      <section aria-labelledby="roles-heading" className="mt-16">
-        <h2 id="roles-heading" className="text-xl font-semibold text-gray-900">
+      <section aria-labelledby="roles-heading" className="mx-auto mt-16 w-full max-w-6xl">
+        <h2 id="roles-heading" className="text-xl font-semibold text-slate-900">
           Built for the whole team
         </h2>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
-          <div className="rounded-xl border border-gray-200 p-5">
-            <h3 className="font-semibold text-gray-900">Employees</h3>
-            <p className="mt-2 text-sm text-gray-700">
-              View products and keep stock counts up to date.
+          <div className="rounded-xl border border-slate-200 bg-white p-5">
+            <h3 className="font-semibold text-slate-900">Employees</h3>
+            <p className="mt-2 text-sm text-slate-600">
+              View product details and keep up with stock information.
             </p>
           </div>
-          <div className="rounded-xl border border-gray-200 p-5">
-            <h3 className="font-semibold text-gray-900">Admins</h3>
-            <p className="mt-2 text-sm text-gray-700">
+          <div className="rounded-xl border border-slate-200 bg-white p-5">
+            <h3 className="font-semibold text-slate-900">Admins</h3>
+            <p className="mt-2 text-sm text-slate-600">
               Manage the product catalog and staff accounts.
             </p>
           </div>
-          <div className="rounded-xl border border-gray-200 p-5">
-            <h3 className="font-semibold text-gray-900">Owners</h3>
-            <p className="mt-2 text-sm text-gray-700">
+          <div className="rounded-xl border border-slate-200 bg-white p-5">
+            <h3 className="font-semibold text-slate-900">Owners</h3>
+            <p className="mt-2 text-sm text-slate-600">
               Monitor stock value, low-stock alerts, and a full history of
               changes.
             </p>

@@ -1,6 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { requireRole } from "@/app/lib/session";
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -8,6 +9,7 @@ export default function NewProductPage() {
   async function createProduct(formData: FormData) {
     "use server";
 
+    const currentUser = await requireRole("Admin");
     const sku = String(formData.get("sku") || "").trim();
     const name = String(formData.get("name") || "").trim();
     const category = String(formData.get("category") || "").trim();
@@ -24,22 +26,43 @@ export default function NewProductPage() {
     }
 
     await sql`
-      INSERT INTO products (
-        sku,
-        name,
-        category,
+      WITH new_product AS (
+        INSERT INTO products (
+          sku,
+          name,
+          category,
+          stock,
+          price,
+          status
+        )
+        VALUES (
+          ${sku},
+          ${name},
+          ${category},
+          ${stock},
+          ${price},
+          ${status}
+        )
+        RETURNING id, stock
+      )
+      INSERT INTO inventory_transactions (
+        product_id,
+        user_id,
+        transaction_type,
+        previous_quantity,
+        new_quantity,
+        quantity_change,
+        reason
+      )
+      SELECT
+        id,
+        ${currentUser.id},
+        'physical_count',
+        0,
         stock,
-        price,
-        status
-      )
-      VALUES (
-        ${sku},
-        ${name},
-        ${category},
-        ${stock},
-        ${price},
-        ${status}
-      )
+        stock,
+        'Initial stock set on product creation'
+      FROM new_product
     `;
 
     redirect("/products");
