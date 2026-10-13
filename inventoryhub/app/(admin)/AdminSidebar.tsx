@@ -12,6 +12,7 @@ const navigation = [
       { label: "Add product", href: "/products/new" },
       { label: "Users", href: "/users" },
       { label: "Add user", href: "/users/new" },
+      { label: "Stock reports", href: "/reports" },
     ],
   },
 ];
@@ -19,7 +20,11 @@ const navigation = [
 const employeeNavigation = [
   {
     heading: "WORKSPACE",
-    items: [{ label: "Products", href: "/products" }],
+    items: [
+      { label: "Products", href: "/products" },
+      { label: "Report a stock count", href: "/reports/new" },
+      { label: "My stock reports", href: "/reports/mine" },
+    ],
   },
 ];
 
@@ -31,8 +36,10 @@ const ownerNavigation = [
   {
     heading: "REPORTS",
     items: [
+      { label: "Stock reports", href: "/reports" },
       { label: "Stock status", href: "/owner/reports/stock-status" },
       { label: "Low stock", href: "/owner/reports/low-stock" },
+      { label: "Employees", href: "/owner/reports/employees" },
       {
         label: "Transaction history",
         href: "/owner/reports/transaction-history",
@@ -79,7 +86,11 @@ export default function AdminSidebar({
                     pathname !== "/products/new") ||
                   (item.href === "/users" &&
                     pathname.startsWith("/users/") &&
-                    pathname !== "/users/new");
+                    pathname !== "/users/new") ||
+                  (item.href === "/reports" &&
+                    pathname.startsWith("/reports/") &&
+                    pathname !== "/reports/new" &&
+                    pathname !== "/reports/mine");
 
                 return (
                   <li key={item.href}>

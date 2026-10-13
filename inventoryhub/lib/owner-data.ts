@@ -55,6 +55,11 @@ export type Employee = {
   name: string;
 };
 
+export type EmployeeDirectoryEntry = Employee & {
+  email: string;
+  createdAt: string;
+};
+
 export class TransactionHistoryNotConfiguredError extends Error {
   constructor() {
     super("The inventory_transactions table has not been created.");
@@ -119,6 +124,27 @@ export async function getEmployees(): Promise<Employee[]> {
   `;
 
   return rows.map((row) => ({ id: String(row.id), name: row.name }));
+}
+
+export async function getEmployeeDirectory(): Promise<EmployeeDirectoryEntry[]> {
+  const rows = await sql`
+    SELECT id, name, email, created_at
+    FROM public.users
+    WHERE role = 'Employee'
+    ORDER BY name ASC
+  `;
+
+  return rows.map((row) => ({
+    id: String(row.id),
+    name: String(row.name),
+    email: String(row.email),
+    createdAt: new Date(row.created_at).toLocaleDateString("en-PH", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: "Asia/Manila",
+    }),
+  }));
 }
 
 export async function getTransactions(filters: TransactionFilters): Promise<Transaction[]> {
