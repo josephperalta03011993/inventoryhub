@@ -16,7 +16,7 @@ export default async function OwnerDashboardPage() {
   const totalStockValue = getTotalStockValue(products);
 
   return (
-    <main className="min-h-screen bg-white text-black px-8 py-10">
+    <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900 md:px-8 md:py-10">
       <PageHeader
         title="Owner Dashboard"
         description="High-level overview of inventory status and quick access to reports."
@@ -31,17 +31,17 @@ export default async function OwnerDashboardPage() {
 
       {/* Low Stock Preview */}
       <section className="mb-10">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Low Stock Preview</h2>
-          <Link href="/owner/reports/low-stock" className="text-sm underline hover:no-underline">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-slate-900">Low Stock Preview</h2>
+          <Link href="/owner/reports/low-stock" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
             View full report
           </Link>
         </div>
 
-        <div className="border border-[#E5E5E5] rounded-md overflow-hidden">
-          <table className="w-full border-collapse">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+          <table className="w-full min-w-[560px] border-collapse">
             <thead>
-              <tr className="bg-white">
+              <tr>
                 <Th>Product</Th>
                 <Th>SKU</Th>
                 <Th>Quantity</Th>
@@ -54,17 +54,17 @@ export default async function OwnerDashboardPage() {
                 <tr>
                   <td
                     colSpan={4}
-                    className="px-4 py-3 text-sm text-center border-t border-[#E5E5E5]"
+                    className="border-t border-slate-100 px-4 py-6 text-center text-sm text-slate-500"
                   >
                     No products are currently below restock level.
                   </td>
                 </tr>
               ) : (
                 lowStockProducts.map((p) => (
-                  <tr key={p.id} className="border-t border-[#E5E5E5]">
+                  <tr key={p.id} className="border-t border-slate-100">
                     <Td>{p.name}</Td>
                     <Td>{p.sku}</Td>
-                    <Td className="text-red-800 font-medium">{p.quantity}</Td>
+                    <Td className="font-medium text-red-700">{p.quantity}</Td>
                     <Td>{p.restockLevel}</Td>
                   </tr>
                 ))
@@ -76,7 +76,7 @@ export default async function OwnerDashboardPage() {
 
       {/* Quick Links */}
       <section>
-        <h2 className="text-xl font-semibold mb-4">Reports</h2>
+        <h2 className="mb-4 text-xl font-semibold text-slate-900">Reports</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <ReportLink

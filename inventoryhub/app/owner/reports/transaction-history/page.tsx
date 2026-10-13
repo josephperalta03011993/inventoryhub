@@ -5,6 +5,8 @@ import {
   getDefaultTransactionDateRange,
   getEmployees,
   getTransactions,
+  TransactionHistoryNotConfiguredError,
+  type Transaction,
   type TransactionFilters,
 } from "@/lib/owner-data";
 import TransactionHistoryReport from "./TransactionHistoryReport";
@@ -39,16 +41,25 @@ export default async function TransactionHistoryReportPage({
     employeeId: readParam(params.employee),
   };
 
-  const [transactions, employees] = await Promise.all([
-    getTransactions(filters),
-    getEmployees(),
-  ]);
+  const employees = await getEmployees();
+  let transactions: Transaction[] = [];
+  let historyNotConfigured = false;
+
+  try {
+    transactions = await getTransactions(filters);
+  } catch (error) {
+    if (!(error instanceof TransactionHistoryNotConfiguredError)) {
+      throw error;
+    }
+    historyNotConfigured = true;
+  }
 
   return (
     <TransactionHistoryReport
       transactions={transactions}
       employees={employees}
       filters={filters}
+      historyNotConfigured={historyNotConfigured}
       isDefaultRange={startDate === defaults.startDate && endDate === defaults.endDate}
       defaultDays={DEFAULT_HISTORY_DAYS}
     />

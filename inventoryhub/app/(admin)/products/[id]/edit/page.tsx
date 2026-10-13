@@ -1,6 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { requireRole } from "@/app/lib/session";
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -53,6 +54,7 @@ export default async function EditProductPage({
   async function updateProduct(formData: FormData) {
     "use server";
 
+    const currentUser = await requireRole("Admin");
     const sku = String(formData.get("sku") || "").trim();
     const name = String(formData.get("name") || "").trim();
     const category = String(formData.get("category") || "").trim();
@@ -73,15 +75,47 @@ export default async function EditProductPage({
     }
 
     await sql`
-      UPDATE products
-      SET
-        sku = ${sku},
-        name = ${name},
-        category = ${category},
-        stock = ${stock},
-        price = ${price},
-        status = ${status}
-      WHERE id = ${productId}
+      WITH previous_stock AS (
+        SELECT id, stock
+        FROM products
+        WHERE id = ${productId}
+        FOR UPDATE
+      ),
+      updated_product AS (
+        UPDATE products AS product
+        SET
+          sku = ${sku},
+          name = ${name},
+          category = ${category},
+          stock = ${stock},
+          price = ${price},
+          status = ${status}
+        FROM previous_stock AS previous
+        WHERE product.id = previous.id
+        RETURNING
+          product.id,
+          previous.stock AS previous_quantity,
+          product.stock AS new_quantity
+      )
+      INSERT INTO inventory_transactions (
+        product_id,
+        user_id,
+        transaction_type,
+        previous_quantity,
+        new_quantity,
+        quantity_change,
+        reason
+      )
+      SELECT
+        id,
+        ${currentUser.id},
+        'physical_count',
+        previous_quantity,
+        new_quantity,
+        new_quantity - previous_quantity,
+        'Stock quantity updated from product edit'
+      FROM updated_product
+      WHERE previous_quantity <> new_quantity
     `;
 
     redirect("/products");

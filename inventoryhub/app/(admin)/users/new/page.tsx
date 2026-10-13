@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { createUser } from "../actions";
+import { requireRole } from "@/app/lib/session";
 
-export default function NewUserPage() {
+export default async function NewUserPage() {
+  await requireRole("Admin");
   return (
     <div className="space-y-6 p-6">
       {/* Header */}

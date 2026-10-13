@@ -17,9 +17,9 @@ type SummaryCardProps = {
 
 export function SummaryCard({ label, value, className = "" }: SummaryCardProps) {
   return (
-    <div className={`border border-[#E5E5E5] rounded-md px-4 py-5 bg-white ${className}`}>
-      <div className="text-xs uppercase tracking-wide mb-1">{label}</div>
-      <div className="text-2xl font-semibold">{value}</div>
+    <div className={`rounded-xl border border-slate-200 bg-white px-5 py-5 shadow-sm ${className}`}>
+      <div className="mb-1 text-sm font-medium text-slate-500">{label}</div>
+      <div className="text-2xl font-semibold text-slate-900">{value}</div>
     </div>
   );
 }
@@ -35,10 +35,10 @@ export function ReportLink({ title, description, href, className = "" }: ReportL
   return (
     <Link
       href={href}
-      className={`border border-[#E5E5E5] rounded-md px-4 py-4 bg-white hover:bg-[#F9F9F9] transition-colors ${className}`}
+      className={`rounded-xl border border-slate-200 bg-white px-5 py-4 transition hover:border-indigo-200 hover:bg-indigo-50/40 ${className}`}
     >
-      <div className="text-sm font-semibold mb-1">{title}</div>
-      <div className="text-xs">{description}</div>
+      <div className="mb-1 text-sm font-semibold text-slate-900">{title}</div>
+      <div className="text-sm text-slate-500">{description}</div>
     </Link>
   );
 }
@@ -51,7 +51,7 @@ type CellProps = {
 export function Th({ children, className = "" }: CellProps) {
   return (
     <th
-      className={`px-4 py-2 text-left text-xs font-semibold border-b border-[#E5E5E5] ${className}`}
+      className={`border-b border-slate-200 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 ${className}`}
     >
       {children}
     </th>
@@ -60,7 +60,7 @@ export function Th({ children, className = "" }: CellProps) {
 
 export function Td({ children, className = "" }: CellProps) {
   return (
-    <td className={`px-4 py-2 text-sm border-t border-[#E5E5E5] align-middle ${className}`}>
+    <td className={`border-t border-slate-100 px-4 py-3 text-sm align-middle text-slate-700 ${className}`}>
       {children}
     </td>
   );
@@ -74,8 +74,8 @@ type PageHeaderProps = {
 export function PageHeader({ title, description }: PageHeaderProps) {
   return (
     <header className="mb-8">
-      <h1 className="text-3xl font-bold">{title}</h1>
-      <p className="mt-2 text-sm">{description}</p>
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900">{title}</h1>
+      <p className="mt-2 text-sm text-slate-600">{description}</p>
     </header>
   );
 }
@@ -127,7 +127,7 @@ export function ExportCsvButton<T extends Record<string, unknown>>({
       type="button"
       onClick={handleExport}
       disabled={data.length === 0}
-      className={`text-sm border border-[#E5E5E5] rounded-md px-3 py-1.5 hover:bg-[#F9F9F9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
       Export CSV
     </button>

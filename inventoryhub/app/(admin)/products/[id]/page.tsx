@@ -1,6 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { requireAnyRole } from "@/app/lib/session";
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -23,6 +24,7 @@ type PageProps = {
 export default async function ProductDetailsPage({
   params,
 }: PageProps) {
+  const currentUser = await requireAnyRole(["Admin", "Employee"]);
   const { id } = await params;
   const productId = Number(id);
 
@@ -141,12 +143,14 @@ export default async function ProductDetailsPage({
             Back
           </Link>
 
-          <Link
-            href={`/products/${product.id}/edit`}
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-          >
-            Edit Product
-          </Link>
+          {currentUser.role === "Admin" && (
+            <Link
+              href={`/products/${product.id}/edit`}
+              className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              Edit Product
+            </Link>
+          )}
         </div>
       </div>
     </div>

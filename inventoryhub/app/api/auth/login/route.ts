@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/app/lib/db';
-import { LoginSchema, hashPassword, signSessionToken } from '@/app/lib/auth-utils';
+import { LoginSchema, UserRoleSchema, hashPassword, signSessionToken } from '@/app/lib/auth-utils';
 
 export async function POST(request: Request) {
   try {
@@ -43,13 +43,28 @@ export async function POST(request: Request) {
     }
 
    
+    const role = UserRoleSchema.safeParse(userRecord.role);
+    if (!role.success) {
+      return NextResponse.json(
+        { error: 'This account is not configured with a valid role.' },
+        { status: 403 }
+      );
+    }
+
     const sessionTokenToken = await signSessionToken({
       id: String(userRecord.id),
       email: userRecord.email,
-      role: userRecord.role as 'Employee' | 'Admin' | 'Owner',
+      role: role.data,
     });
 
-        const response = NextResponse.json({ message: 'Authentication verified.' }, { status: 200 });
+    const redirectTo =
+      role.data === 'Owner'
+        ? '/owner/dashboard'
+        : '/products';
+    const response = NextResponse.json(
+      { message: 'Authentication verified.', redirectTo },
+      { status: 200 }
+    );
     
     response.cookies.set('inventory_session', sessionTokenToken, {
       httpOnly: true, // Safeguards against cross-site scripting (XSS) client attacks

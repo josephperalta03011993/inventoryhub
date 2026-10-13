@@ -3,8 +3,11 @@
 import { sql } from "@/app/lib/db";
 import { redirect } from "next/navigation";
 import { hashPassword } from "@/app/lib/auth-utils";
+import { requireRole } from "@/app/lib/session";
 
 export async function createUser(formData: FormData) {
+  await requireRole("Admin");
+
   const name = String(formData.get("name") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const password = String(formData.get("password") || "");
@@ -54,6 +57,8 @@ export async function createUser(formData: FormData) {
 }
 
 export async function updateUser(formData: FormData) {
+  await requireRole("Admin");
+
   const id = String(formData.get("id"));
   const name = String(formData.get("name") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
@@ -85,6 +90,8 @@ export async function updateUser(formData: FormData) {
 }
 
 export async function deleteUser(formData: FormData) {
+  await requireRole("Admin");
+
   const id = String(formData.get("id"));
 
   if (!id) {

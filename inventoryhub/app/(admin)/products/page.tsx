@@ -1,7 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import Link from "next/link";
-import { deleteProduct } from "./actions";
 import DeleteProductButton from "./DeleteProductButton";
+import { requireAnyRole } from "@/app/lib/session";
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -15,6 +15,7 @@ type Product = {
 };
 
 export default async function ProductsPage() {
+  const currentUser = await requireAnyRole(["Admin", "Employee"]);
   let products: Product[] = [];
 
   try {
@@ -30,7 +31,7 @@ export default async function ProductsPage() {
       ORDER BY id DESC
     `;
 
-    products = result.map((product: any) => ({
+    products = result.map((product) => ({
       id: Number(product.id),
       name: product.name,
       category: product.category,
@@ -63,12 +64,14 @@ export default async function ProductsPage() {
           </p>
         </div>
 
-        <Link
-          href="/products/new"
-          className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
-        >
-          Add Product
-        </Link>
+        {currentUser.role === "Admin" && (
+          <Link
+            href="/products/new"
+            className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+          >
+            Add Product
+          </Link>
+        )}
       </div>
 
       {/* Stats */}
@@ -176,14 +179,17 @@ export default async function ProductsPage() {
                           View
                         </Link>
 
-                        <Link
-                          href={`/products/${product.id}/edit`}
-                          className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
-                        >
-                          Edit
-                        </Link>
-
-                        <DeleteProductButton id={product.id} />
+                        {currentUser.role === "Admin" && (
+                          <>
+                            <Link
+                              href={`/products/${product.id}/edit`}
+                              className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+                            >
+                              Edit
+                            </Link>
+                            <DeleteProductButton id={product.id} />
+                          </>
+                        )}
                       
                       </div>
                     </td>
