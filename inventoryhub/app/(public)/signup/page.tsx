@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function SignUpPage() {
+  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,54 +20,65 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      // 🚀 FIXED: Pointing explicitly to the absolute API directory layout hub route path
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
-
-      const data = await response.json();
+      const data: { error?: string } = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to provision account credentials.');
+        throw new Error(data.error || 'Account registration failed.');
       }
 
-      setUiSuccess('Account registration successful! Redirecting to sign in terminal...');
+      setUiSuccess('Account created. Redirecting to sign in...');
       setName('');
       setEmail('');
       setPassword('');
-
-      setTimeout(() => {
-        window.location.href = '/login';
-      }, 2000);
-
+      setTimeout(() => router.replace('/login'), 1000);
     } catch (err: unknown) {
-      setUiError(err instanceof Error ? err.message : 'Network communication failure occurred.');
+      setUiError(
+        err instanceof Error ? err.message : 'Could not connect to the server.',
+      );
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    <main className="min-h-screen bg-white text-black font-sans flex flex-col justify-center items-center px-6 py-12 selection:bg-black selection:text-white">
-      <div className="max-w-md w-full bg-white border border-[#E5E5E5] p-8 rounded-2xl shadow-2xs space-y-6">
-        
-        <div className="text-center space-y-1">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="w-2.5 h-2.5 bg-black rounded-full block" />
-            <span className="text-xs font-black uppercase tracking-widest text-black">InventoryHub</span>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-6 py-12 text-slate-900">
+      <div className="w-full max-w-md space-y-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="space-y-1 text-center">
+          <div className="mb-2 flex items-center justify-center gap-2">
+            <span className="block h-2.5 w-2.5 rounded-full bg-indigo-600" />
+            <span className="text-xs font-bold uppercase tracking-widest text-slate-700">
+              InventoryHub
+            </span>
           </div>
-          <h2 className="text-xl font-black uppercase tracking-tight text-gray-900">Clearance Request</h2>
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Register New Personnel Profile</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Create an account
+          </h1>
+          <p className="text-sm text-slate-500">
+            Register for InventoryHub access.
+          </p>
         </div>
 
-        {uiError && <div aria-live="polite" className="p-3 bg-white border border-black text-xs font-bold uppercase text-center text-black">⚠️ {uiError}</div>}
-        {uiSuccess && <div className="p-3 bg-gray-50 border border-[#E5E5E5] text-xs font-bold uppercase text-center text-gray-900">✓ {uiSuccess}</div>}
+        {uiError && (
+          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+            {uiError}
+          </div>
+        )}
+        {uiSuccess && (
+          <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+            {uiSuccess}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name-field" className="block text-[10px] font-black uppercase tracking-widest text-black mb-1.5">Full Legal Name</label>
+            <label htmlFor="name-field" className="mb-1.5 block text-sm font-medium text-slate-700">
+              Full name
+            </label>
             <input
               id="name-field"
               type="text"
@@ -73,13 +86,15 @@ export default function SignUpPage() {
               disabled={isLoading}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl border border-[#E5E5E5] bg-white px-4 py-2.5 text-xs text-gray-900 font-medium focus:border-black focus:outline-hidden transition-all"
-              placeholder="John Doe"
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              placeholder="Jordan Lee"
             />
           </div>
 
           <div>
-            <label htmlFor="email-field" className="block text-[10px] font-black uppercase tracking-widest text-black mb-1.5">Business Email Address</label>
+            <label htmlFor="email-field" className="mb-1.5 block text-sm font-medium text-slate-700">
+              Email
+            </label>
             <input
               id="email-field"
               type="email"
@@ -87,43 +102,47 @@ export default function SignUpPage() {
               disabled={isLoading}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-[#E5E5E5] bg-white px-4 py-2.5 text-xs text-gray-900 font-medium focus:border-black focus:outline-hidden transition-all"
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
               placeholder="name@company.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password-field" className="block text-[10px] font-black uppercase tracking-widest text-black mb-1.5">System Access Password</label>
+            <label htmlFor="password-field" className="mb-1.5 block text-sm font-medium text-slate-700">
+              Password
+            </label>
             <input
               id="password-field"
               type="password"
               required
+              minLength={6}
               disabled={isLoading}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-[#E5E5E5] bg-white px-4 py-2.5 text-xs text-gray-900 font-medium focus:border-black focus:outline-hidden transition-all"
-              placeholder="Minimum 6 characters"
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              placeholder="At least 6 characters"
             />
           </div>
-
-          {/* 🚀 ROLE SELECT DROPDOWN COMLETELY DELETED ACCORDING TO USER STORY SPECIFICATIONS */}
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-black text-white text-xs font-black uppercase tracking-widest py-3 px-4 hover:bg-gray-900 disabled:bg-gray-400 transition-all text-center rounded-xl cursor-pointer"
+            className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isLoading ? 'Requesting Access...' : 'Submit Clearance Request'}
+            {isLoading ? 'Creating account...' : 'Create account'}
           </button>
         </form>
 
-        <div className="border-t border-[#E5E5E5] pt-4 text-center">
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-            Already have clearance? <Link href="/login" className="text-black hover:underline ml-1">Log in here</Link>
-          </p>
-        </div>
+        <p className="border-t border-slate-200 pt-4 text-center text-sm text-slate-500">
+          Already have an account?{' '}
+          <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-700">
+            Sign in
+          </Link>
+        </p>
       </div>
-      <Link href="/" className="mt-6 text-[10px] font-black text-gray-400 hover:text-black uppercase tracking-widest">← Return To Terminal</Link>
+      <Link href="/" className="mt-6 text-sm font-medium text-slate-500 hover:text-indigo-700">
+        ← Back to home
+      </Link>
     </main>
   );
 }

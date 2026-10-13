@@ -22,12 +22,14 @@ export default function TransactionHistoryReport({
   transactions,
   employees,
   filters,
+  historyNotConfigured,
   isDefaultRange,
   defaultDays,
 }: {
   transactions: Transaction[];
   employees: Employee[];
   filters: TransactionFilters;
+  historyNotConfigured: boolean;
   isDefaultRange: boolean;
   defaultDays: number;
 }) {
@@ -46,11 +48,24 @@ export default function TransactionHistoryReport({
   }));
 
   return (
-    <main className="min-h-screen bg-white text-black px-8 py-10">
+    <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900 md:px-8 md:py-10">
       <PageHeader
         title="Transaction History"
         description={`Full audit trail of every inventory adjustment, with employee and reason. Shows the last ${defaultDays} days unless you choose a date range.`}
       />
+
+      {historyNotConfigured && (
+        <div
+          role="alert"
+          className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        >
+          Transaction history is not set up yet. Run{" "}
+          <code>database/migrations/001_inventory_transactions.sql</code> in
+          your Neon SQL Editor, then refresh this page. The migration records
+          current quantities as opening balances; earlier stock changes cannot
+          be recovered.
+        </div>
+      )}
 
       <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
         {/* Keyed on the filters so the inputs reset after navigating back/forward */}
@@ -66,7 +81,7 @@ export default function TransactionHistoryReport({
               name="start"
               defaultValue={filters.startDate}
               aria-label="Filter start date"
-              className="border border-[#E5E5E5] rounded-md px-3 py-1.5 text-sm"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
             />
           </label>
           <label className="flex flex-col text-sm">
@@ -76,7 +91,7 @@ export default function TransactionHistoryReport({
               name="end"
               defaultValue={filters.endDate}
               aria-label="Filter end date"
-              className="border border-[#E5E5E5] rounded-md px-3 py-1.5 text-sm"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
             />
           </label>
           <label className="flex flex-col text-sm">
@@ -85,7 +100,7 @@ export default function TransactionHistoryReport({
               name="employee"
               defaultValue={filters.employeeId}
               aria-label="Filter by employee"
-              className="border border-[#E5E5E5] rounded-md px-3 py-1.5 text-sm bg-white"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
             >
               <option value="">All employees</option>
               {employees.map((e) => (
@@ -97,12 +112,12 @@ export default function TransactionHistoryReport({
           </label>
           <button
             type="submit"
-            className="text-sm border border-[#E5E5E5] rounded-md px-3 py-1.5 hover:bg-[#F9F9F9] transition-colors"
+            className="rounded-lg border border-indigo-600 bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
           >
             Apply
           </button>
           {isFiltered && (
-            <Link href={REPORT_PATH} className="text-sm underline hover:no-underline">
+            <Link href={REPORT_PATH} className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
               Reset filters
             </Link>
           )}
@@ -111,10 +126,10 @@ export default function TransactionHistoryReport({
         <ExportCsvButton data={exportRows} filename="transaction-history-report.csv" />
       </div>
 
-      <div className="border border-[#E5E5E5] rounded-md overflow-hidden">
-        <table className="w-full border-collapse">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table className="w-full min-w-[900px] border-collapse">
           <thead>
-            <tr className="bg-white">
+            <tr>
               <Th>Date</Th>
               <Th>Product</Th>
               <Th>Type</Th>
@@ -129,13 +144,15 @@ export default function TransactionHistoryReport({
           <tbody>
             {transactions.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-3 text-sm text-center border-t border-[#E5E5E5]">
-                  No transactions match the selected filters.
+                <td colSpan={8} className="border-t border-slate-100 px-4 py-6 text-center text-sm text-slate-500">
+                  {historyNotConfigured
+                    ? "Transaction history is unavailable until the database setup is complete."
+                    : "No transactions match the selected filters."}
                 </td>
               </tr>
             ) : (
               transactions.map((t) => (
-                <tr key={t.id} className="border-t border-[#E5E5E5]">
+                <tr key={t.id} className="border-t border-slate-100">
                   <Td>{t.displayTime}</Td>
                   <Td>
                     {t.productName}{" "}
@@ -144,7 +161,7 @@ export default function TransactionHistoryReport({
                   <Td>{TYPE_LABELS[t.transactionType] ?? t.transactionType}</Td>
                   <Td>{t.previousQuantity}</Td>
                   <Td>{t.newQuantity}</Td>
-                  <Td className={t.quantityChange < 0 ? "text-red-800 font-medium" : "text-green-700 font-medium"}>
+                  <Td className={t.quantityChange < 0 ? "text-red-600 font-medium" : "text-green-700 font-medium"}>
                     {t.quantityChange > 0 ? `+${t.quantityChange}` : t.quantityChange}
                   </Td>
                   <Td>{t.employeeName}</Td>

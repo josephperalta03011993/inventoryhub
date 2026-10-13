@@ -1,6 +1,7 @@
 import { sql } from "@/app/lib/db";
 import Link from "next/link";
 import DeleteUserButton from "./DeleteUserButton";
+import { requireRole } from "@/app/lib/session";
 
 type User = {
   id: string;
@@ -10,6 +11,7 @@ type User = {
 };
 
 export default async function UsersPage() {
+  await requireRole("Admin");
   let users: User[] = [];
 
   try {
@@ -23,7 +25,7 @@ export default async function UsersPage() {
       ORDER BY created_at DESC
     `;
 
-    users = result.map((user: any) => ({
+    users = result.map((user) => ({
       id: user.id,
       name: user.name,
       email: user.email,

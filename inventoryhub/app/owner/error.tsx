@@ -17,7 +17,7 @@ export default function OwnerError({
   }, [error]);
 
   return (
-    <main className="min-h-screen bg-white text-black px-8 py-10">
+    <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900 md:px-8 md:py-10">
       <PageHeader
         title="Couldn't load this report"
         description="The inventory data couldn't be reached. The numbers below would not be accurate, so nothing is shown. Please try again in a moment."
@@ -26,7 +26,7 @@ export default function OwnerError({
       <button
         type="button"
         onClick={() => retry()}
-        className="text-sm border border-[#E5E5E5] rounded-md px-3 py-1.5 hover:bg-[#F9F9F9] transition-colors"
+        className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
       >
         Try again
       </button>
