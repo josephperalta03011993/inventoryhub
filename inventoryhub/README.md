@@ -20,7 +20,6 @@ After signing in, test the role-specific flows:
 
 - Joseph Peralta
 - Bruce Nyeha
-- Erandy Ramirez
 - Bryton Palmer
 
 ## Product demo summary
