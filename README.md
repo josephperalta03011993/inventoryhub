@@ -1,151 +1,122 @@
-InventoryHub
+# InventoryHub
 
-InventoryHub is a web-based inventory management system designed for small businesses and organizations to track products and stock levels efficiently. Employees can view product and stock information, administrators can manage products and users, and owners can monitor inventory status and reports. It helps improve inventory accuracy and reduce manual record-keeping.
+InventoryHub is a web-based inventory management system for small businesses and organizations. It gives employees, administrators, and owners a shared, database-backed view of products, stock counts, and inventory activity.
 
-Problem: Many small businesses still manage inventory using spreadsheets or paper records, making it difficult to track stock levels accurately and efficiently.
+**Live application:** [https://inventoryhub-one.vercel.app](https://inventoryhub-one.vercel.app)
 
-Live demo: https://inventoryhub-nine.vercel.app/
-Repository: https://github.com/josephperalta03011993/inventoryhub
-Original project constitution and specification: docs/project-plan.md
-Team
-Name	Responsibility
-Joseph Peralta	User management (Users CRUD)
-Bruce Nyeha	 Auth and login
-Erandy Ramirez  
-Bryton Palmer	Owner dashboard and reports
-Tech Stack
-Framework: Next.js 16 (App Router) with React 19
-Language: TypeScript
-Styling: Tailwind CSS 4
-Database: Neon (serverless PostgreSQL) via @neondatabase/serverless
-Authentication: custom JWT sessions (jose) stored in an httpOnly cookie
-Validation: Zod
-Tooling: ESLint and Prettier
-Hosting: Vercel
-Features
-Products: list, view, create, edit, and delete products (SKU, name, category, stock, price, status).
-Users: list, view, create, edit, and delete accounts with three roles: Employee, Admin, and Owner.
-Authentication: sign up, log in, and log out. Public sign-ups are always created as Employees.
-Owner dashboard: stock value and low-stock overview, plus three reports:
-Low stock (products at or below the restock threshold)
-Stock status
-Transaction history, filterable by date range and employee
-Loading and error states on the owner pages, so a failed database query never looks like an empty report.
-Getting Started
-Prerequisites
-Node.js 20 or newer
-A free Neon account
-1. Clone and install
-bash
-git clone https://github.com/josephperalta03011993/inventoryhub.git
-cd inventoryhub/inventoryhub
-npm install
+**Repository:** [josephperalta03011993/inventoryhub](https://github.com/josephperalta03011993/inventoryhub)
 
-(Run the commands in the folder that contains package.json.)
+## Team
 
-2. Create the database
+- Joseph Peralta
+- Bruce Nyeha
+- Erandy Ramirez
+- Bryton Palmer
 
-Create a Neon project, open its SQL Editor, and run the following reference schema:
+## Product demo summary
 
-sql
-CREATE TABLE products (
-  id        SERIAL PRIMARY KEY,
-  sku       TEXT NOT NULL UNIQUE,
-  name      TEXT NOT NULL,
-  category  TEXT NOT NULL,
-  stock     INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
-  price     NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (price >= 0),
-  status    TEXT NOT NULL DEFAULT 'In Stock'
-);
+Small teams often track inventory in spreadsheets or on paper, making it difficult to keep counts accurate and identify items that need attention. InventoryHub provides a shared, database-backed inventory so staff can view current products and owners can monitor stock levels, low-stock items, and inventory activity.
 
-CREATE TABLE users (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name        TEXT NOT NULL,
-  email       TEXT NOT NULL UNIQUE,
-  password    TEXT NOT NULL,
-  role        TEXT NOT NULL DEFAULT 'Employee'
-    CHECK (role IN ('Employee','Admin','Owner')),
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+Employees can submit stock counts and check whether they have been reviewed. Administrators manage products and user accounts and review submitted counts; owners use the dashboard and reports to oversee inventory and activity. This role-based workflow connects stock reporting to inventory records and their audit history.
 
-CREATE TABLE inventory_transactions (
-  id                 SERIAL PRIMARY KEY,
-  product_id         INTEGER REFERENCES products(id) ON DELETE SET NULL,
-  user_id            UUID REFERENCES users(id) ON DELETE SET NULL,
-  transaction_type   TEXT NOT NULL
-    CHECK (transaction_type IN ('stock_adjustment','restock','physical_count')),
-  previous_quantity  INTEGER NOT NULL,
-  new_quantity       INTEGER NOT NULL,
-  quantity_change    INTEGER NOT NULL,
-  reason             TEXT,
-  created_at         TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+## Features
 
-For an existing database, run `./inventoryhub/database/migrations/001_inventory_transactions.sql` in the Neon SQL Editor. It creates the transaction-history table and indexes if needed, and records current product quantities as opening balances. It does not reconstruct stock changes made before the migration.
+- Role-based sign-up and sign-in for Employees, Admins, and Owners.
+- Product browsing and Admin product create, read, update, and delete.
+- Admin user create, read, update, and delete.
+- Employee stock-count reports with review status.
+- Admins and Owners can approve or reject reports; approval updates product stock and creates an audit entry.
+- Owner dashboard and reports for stock status, low stock, employees, and transaction history.
+- Responsive layouts for desktop and mobile.
 
-3. Configure environment variables
+Public sign-up creates an Employee account. Admins can create accounts with any supported role.
 
-Create a file named .env.local in the project root (it is git-ignored):
+## Technology
 
-DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
-[JWT SECRET VARIABLE NAME]="a-long-random-string"
+- Next.js App Router, React, and TypeScript
+- Tailwind CSS
+- Neon PostgreSQL using `@neondatabase/serverless`
+- Auth.js v5 Credentials provider with JWT sessions and role-based access
+- Zod validation
+- Vercel deployment
 
-Copy the connection string from the Connect button in your Neon project.
+## Access instructions
 
-4. Run the app
-bash
+Sign in at `/login` with credentials provided privately by the instructor. Authentication uses **Auth.js v5** with the Credentials provider, not Clerk. Do not publish demo passwords in this repository.
+
+1. As an Employee, browse products, submit a stock count, and check its status under **My Stock Reports**.
+2. As an Admin, create or update a disposable product or user, remove it, and review submitted counts under **Stock Reports**.
+3. As an Owner, review the dashboard and the stock-status, low-stock, employee, and transaction-history reports.
+
+## Local setup
+
+The Next.js app is in the `inventoryhub/` subdirectory. From the repository root:
+
+```bash
+cd inventoryhub
+npm ci
+```
+
+Create `inventoryhub/.env.local` with:
+
+```dotenv
+DATABASE_URL=your_neon_postgresql_connection_string
+AUTH_SECRET=your_random_secret_at_least_32_characters_long
+```
+
+Keep `.env.local` private and do not commit it. The Neon database must have the baseline `public.users` and `public.products` tables expected by the app. Apply the checked-in migrations, in order, in the Neon SQL Editor:
+
+1. `inventoryhub/database/migrations/001_inventory_transactions.sql`
+2. `inventoryhub/database/migrations/002_employee_stock_reports.sql`
+
+The migrations add inventory audit history and employee stock reports; they do not create the baseline `users` and `products` tables.
+
+Start the development server from the `inventoryhub/` directory:
+
+```bash
 npm run dev
+```
 
-Open http://localhost:3000.
+Open [http://localhost:3000](http://localhost:3000). Available checks include `npm run lint` and `npm run build`; run `npm run build` before `npm run start`.
 
-5. Create the first Owner account
-Sign up at /signup. New accounts are Employees.
-In the Neon SQL Editor, promote your account:
-sql
-UPDATE users SET role = 'Owner' WHERE email = 'your-email@example.com';
-Deployment
+## Deployment
 
-The app is deployed on Vercel.
+In Vercel, set **Root Directory** to `inventoryhub`, then configure `DATABASE_URL` and `AUTH_SECRET` for the deployment environment. Confirm the Neon baseline tables exist and both migrations have been applied, then deploy. Environment variable changes require a new deployment.
 
-Import the GitHub repository in Vercel (set the root directory to the folder containing package.json).
-Add the same environment variables from .env.local under Settings → Environment Variables.
-Deploy. Variables only apply to new builds, so redeploy after changing them.
-Confirm that Deployment Protection allows public visitors to view the production site.
-API Routes
-Route	Method	Request body	Success response	Errors
-/api/auth/signup	POST	{ name, email, password }	201 account created (role is always Employee)	400 invalid input, 409 email already registered
-/api/auth/login	POST	{ email, password }	200 and sets the inventory_session cookie (2-hour expiry)	400 invalid input, 401 invalid credentials
-/api/auth/logout	POST	—	200 and clears the inventory_session cookie	—
+## Application routes
 
-The original specification proposed REST endpoints under /api/products and /api/reports. In the implemented app, products, users, and reports are read in server components and changed through Server Actions, so the only route handlers are the authentication routes above.
+| Route | Access | Purpose |
+| --- | --- | --- |
+| `/` | Public | Landing page |
+| `/signup`, `/login` | Public | Registration and sign-in |
+| `/products` | Employee, Admin | Browse inventory; Admins can manage products |
+| `/products/new`, `/products/[id]/edit` | Admin | Create and update products |
+| `/users`, `/users/new`, `/users/[id]`, `/users/[id]/edit` | Admin | Manage user accounts |
+| `/reports/new`, `/reports/mine` | Employee | Submit stock counts and view report history |
+| `/reports` | Admin, Owner | Review stock-count reports |
+| `/owner/dashboard` | Owner | Inventory overview |
+| `/owner/reports/stock-status` | Owner | Stock totals and inventory value |
+| `/owner/reports/low-stock` | Owner | Products below their restock threshold |
+| `/owner/reports/employees` | Owner | Employee directory |
+| `/owner/reports/transaction-history` | Owner | Inventory audit history |
 
-The login and signup pages are client components that call these routes, which query the users table (client, then route handler, then database). Product, user, and report pages read from the database in server components, and create/update/delete operations use Server Actions.
+## API routes
 
-Project Structure
-app/
-  api/auth/        login and signup route handlers
-  lib/             database client (db.ts) and auth helpers (auth-utils.ts)
-  products/        product list, detail, create, edit
-  (admin)/users/   user management
-  owner/           owner dashboard and reports
-Test Accounts
-Role	Email	Password
-Owner	[email]	[password]
-Admin	[email]	[password]
-Employee	[email]	[password]
-Product Demo
+Product, user, and stock-report changes use authenticated Next.js Server Actions rather than REST endpoints.
 
-The problem. Small shops and warehouse teams often track stock in spreadsheets or on paper. Counts drift, nobody knows who changed what, and low stock is discovered only after a customer is turned away. InventoryHub gives a team one shared, always-current record of what is on hand and a log of every stock change.
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| `/api/auth/signup` | `POST` | Creates a public Employee account from `name`, `email`, and `password`. |
+| `/api/auth/[...nextauth]` | `GET`, `POST` | Auth.js handlers for authentication and session actions; Credentials are checked against the Neon `users` table. |
 
-The users. The app serves three kinds of people. Employees view products and stock information. Admins manage the product catalog and staff accounts. Owners review the business: how much stock value is on hand, which items need restocking, and who made which change and when.
+## Known issues and opportunities
 
-The key flow. An owner signs in and lands on the dashboard, sees the low-stock count and total stock value at a glance, and opens the Low Stock report to decide what to reorder. From the Transaction History report they can filter by date range and employee to audit changes. The value is fewer stockouts, accountability for every adjustment, and decisions based on live data instead of guesswork.
+- The repository has no automated test script or checked-in baseline schema/seed script. A new database needs the baseline `users` and `products` tables before migrations can be applied.
+- Password hashes use the existing fast, unsalted hashing format; migration to a salted password-hashing algorithm is a security improvement to plan.
+- The low-stock threshold is fixed, and product status is manually stored; per-product thresholds and derived status would better prevent inconsistencies.
+- Auth.js v5 login, role redirects, protected routes, and logout have been smoke-tested locally. Set `AUTH_SECRET` in Vercel and verify the production deployment before grader testing.
+- The app is in the `inventoryhub/` subdirectory; keep Vercel’s Root Directory set to `inventoryhub`.
 
-Known Issues and Opportunities
-Password hashing: passwords are hashed with a fast, unsalted method (app/lib/auth-utils.ts). Planned follow-up: switch to bcrypt, argon2, or scrypt with a per-user salt.
-Low-stock threshold: the threshold is a fixed value of 10 for every product. A per-product restock level would be more realistic.
-Product status: the status label is entered manually and can disagree with the stock count. Deriving it from stock would remove the inconsistency.
-Error handling: the product and user list pages log database errors and show an empty list. Showing an explicit error state, as the owner pages do, would be clearer.
-Automated tests: the original plan called for Jest, React Testing Library, and end-to-end tests with a coverage target. No automated test suite has been set up yet.
-Signup roles: the original specification let users choose a role at sign-up. For security, public sign-ups are now always Employees, and Admins or Owners are assigned by an existing Owner or Admin.
+## Contributors and workflow
+
+The team uses feature branches and pull requests for changes. See the repository’s merged pull-request history for evidence of the workflow.
