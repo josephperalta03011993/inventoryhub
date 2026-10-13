@@ -116,7 +116,7 @@ Administrators: Manage products, categories, and users.
 Owners: Monitor inventory status, generate reports, and oversee operations.
 
 3. User Stories & Acceptance Criteria
-🟢 Sign Up
+Sign Up
 User Story: As a new user, I want to sign up with my email and password so I can access InventoryHub.
 
 Acceptance Criteria:
@@ -125,7 +125,7 @@ User can register with email, password, and role (employee/admin/owner).
 
 Password must meet security requirements (min length, complexity).
 
-📦 Create (Add Product)
+Create (Add Product)
 User Story: As an administrator, I want to add new products so they can be tracked in the system.
 
 Acceptance Criteria:
@@ -136,7 +136,7 @@ Validation ensures required fields are filled.
 
 Product appears in inventory list immediately after creation.
 
-📖 Read (View Inventory)
+Read (View Inventory)
 User Story: As an employee, I want to view the inventory list so I can check stock levels.
 
 Acceptance Criteria:
@@ -145,7 +145,7 @@ Inventory list displays product name, SKU, quantity, and status (in stock, low s
 
 Search and filter options available.
 
-✏️ Update (Edit Product)
+Update (Edit Product)
 User Story: As an administrator, I want to update product details so inventory stays accurate.
 
 Acceptance Criteria:
@@ -154,7 +154,7 @@ Editable fields: name, category, quantity, price.
 
 Changes saved and reflected immediately.
 
-🗑️ Delete (Remove Product)
+Delete (Remove Product)
 User Story: As an administrator, I want to delete products so outdated items are removed.
 
 Acceptance Criteria:
