@@ -14,7 +14,6 @@ export default async function Home() {
   }
 
   return (
-<<<<<<< HEAD
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-6 py-16">
       <p className="text-sm font-black uppercase tracking-widest text-black">
         InventoryHub
