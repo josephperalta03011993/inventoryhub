@@ -34,12 +34,12 @@ export default async function Home() {
           >
             Log in
           </Link>
-          <Link
+          {/* <Link
             href="/signup"
             className="rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
           >
             Create an account
-          </Link>
+          </Link> */}
         </div>
       </div>
       <section aria-labelledby="roles-heading" className="mx-auto mt-16 w-full max-w-6xl">
