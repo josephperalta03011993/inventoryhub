@@ -1,203 +1,158 @@
-Joseph Peralta
-Bruce Nyeha
-Erandy Ramirez
-Bryton Palmer
+# InventoryHub
 
-InventoryHub: Simple Inventory Management System
+InventoryHub is a web-based inventory management system for small businesses and organizations. It centralizes product and stock records and gives employees, administrators, and owners tools suited to their responsibilities.
 
-Description
-InventoryHub is a web-based inventory management system designed for small businesses and organizations to track products and stock levels efficiently. The system allows employees to update inventory records, administrators to manage products and users, and owners to monitor inventory status and reports. It helps improve inventory accuracy and reduce manual record-keeping.
- 
-Problem or Need
-Many small businesses still manage inventory using spreadsheets or paper records, making it difficult to track stock levels accurately and efficiently.
- 
-Core Features
-User authentication with role-based access (Employee, Admin, Owner)
-Create, Read, Update, and Delete (CRUD) inventory items
-Stock quantity tracking and updates
-User management for Admins
-Inventory dashboard and summary reports for Owners
+**Live application:** [https://inventoryhub-one.vercel.app](https://inventoryhub-one.vercel.app)
 
-## Project Constitution 
-Governing Principles for InventoryHub
+**Repository:** [josephperalta03011993/inventoryhub](https://github.com/josephperalta03011993/inventoryhub)
 
-1. TypeScript Standards
-Strict mode enabled ("strict": true in tsconfig.json).
+## Access instructions
 
-No use of any; prefer unknown, generics, or discriminated unions.
+Sign in at `/login` with an account provided by the instructor. Authentication is implemented with **Auth.js v5** and its Credentials provider; it is not using Clerk. Public sign-up creates Employee accounts. Admin and Owner demo credentials should be provided to the grader privately rather than committed to this public repository.
 
-Strong typing for API responses, props, and state.
+After signing in, test the role-specific flows:
 
-Utility types (Partial, Pick, Omit) used for clarity, not shortcuts.
+1. As an Employee, browse products, submit a stock count, and check its status under **My Stock Reports**.
+2. As an Admin, create or update a disposable product or user, then remove it; review submitted counts from **Stock Reports**.
+3. As an Owner, review the dashboard and the stock status, low-stock, employee, and transaction-history reports.
 
-Consistent use of interface for contracts and type for unions.
+## Team
 
-2. Tailwind CSS Conventions
-Utility-first approach: styling via Tailwind classes, not custom CSS.
+- Joseph Peralta
+- Bruce Nyeha
+- Erandy Ramirez
+- Bryton Palmer
 
-Avoid @apply unless for reusable component patterns.
+## Product demo summary
 
-No custom CSS unless Tailwind cannot achieve the design.
+Small teams often track inventory in spreadsheets or on paper, which makes it hard to keep counts accurate and to see which items need attention. InventoryHub provides a shared, database-backed inventory so staff can view current products and owners can monitor stock levels, low-stock items, and inventory activity.
 
-Use Tailwind configuration (tailwind.config.js) for theme extensions (colors, spacing, typography).
+Employees can submit stock counts and check whether they have been reviewed. Administrators manage products and user accounts and review submitted counts; owners use the dashboard and reports to oversee inventory and activity. This role-based workflow keeps routine stock reporting connected to the inventory record and its audit history.
 
-Responsive design via Tailwind’s breakpoint utilities (sm:, md:, lg:).
+## Features
 
-3. Next.js Patterns
-App Router: use app/ directory with file-based routing.
+- Sign up and sign in with role-based access for Employees, Admins, and Owners.
+- Browse products and stock details.
+- Admin product CRUD: add, view, edit, and delete products.
+- Admin user CRUD: create, view, edit, and delete user accounts.
+- Employee stock-count reports with review status.
+- Admins and Owners can approve or reject stock-count reports; approval updates product stock and creates an audit entry.
+- Owner dashboard, stock-status and low-stock reports, employee directory, and transaction history.
+- Responsive layouts for desktop and mobile.
 
-Server Components: default to server components for data fetching and rendering.
+Public sign-up creates an Employee account. Admins can create accounts with any supported role.
 
-Client Components: only when interactivity or hooks (useState, useEffect) are required.
+## Technology
 
-Data fetching: prefer fetch in server components; use caching and revalidation (revalidate).
+- Next.js App Router, React, and TypeScript
+- Tailwind CSS
+- Neon PostgreSQL using `@neondatabase/serverless`
+- Auth.js v5 Credentials provider, JWT sessions, and role-based access
+- Zod validation
+- Vercel deployment
 
-API routes: colocated in app/api/ with proper typing.
+## Local setup
 
-Error handling: use error.tsx and loading.tsx conventions.
+The Next.js project is in the `inventoryhub/` directory of the repository. Run these commands from that directory:
 
-4. Testing Expectations
-Unit tests with Jest and React Testing Library.
+```bash
+npm ci
+```
 
-Integration tests for API routes and database interactions.
+Create an `.env.local` file in `inventoryhub/` with:
 
-End-to-end tests with Playwright or Cypress.
+```dotenv
+DATABASE_URL=your_neon_postgresql_connection_string
+AUTH_SECRET=your_random_secret_at_least_32_characters_long
+```
 
-80% minimum coverage enforced via CI.
+Use a Neon connection string for `DATABASE_URL`. Generate a unique secret for `AUTH_SECRET`; for example, with Node.js:
 
-Snapshot testing for UI components.
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-Mocking external services (e.g., database, APIs).
+Do not commit `.env.local` or share its values. The database must already contain the `public.users` and `public.products` tables expected by the application. This repository does not include a baseline schema or seed script for those tables.
 
-5. Naming Conventions
-Files & folders: kebab-case (inventory-list.tsx).
+Apply the checked-in database migrations to the same Neon database, in order:
 
-Components: PascalCase (InventoryCard.tsx).
+1. `database/migrations/001_inventory_transactions.sql`
+2. `database/migrations/002_employee_stock_reports.sql`
 
-Variables & functions: camelCase (updateStockLevel).
+For a new database, first provision the baseline `users` and `products` tables with the columns used by the application; the two checked-in migrations add audit history and employee stock reports, not those baseline tables. You can run each migration in the Neon SQL Editor.
 
-Types & interfaces: PascalCase with Props or Type suffix (InventoryItemProps).
+Start the development server:
 
-Constants: UPPER_SNAKE_CASE (MAX_STOCK_LIMIT).
+```bash
+npm run dev
+```
 
-Tests: mirror file structure with .test.tsx suffix.
+Open [http://localhost:3000](http://localhost:3000).
 
-6. Team Collaboration Guidelines
-Git workflow: feature branches → pull requests → code review → merge.
+Available project commands:
 
-Commit messages: Conventional Commits (feat:, fix:, chore:).
+```bash
+npm run lint
+npm run build
+npm run start
+```
 
-Code reviews: mandatory for all merges; focus on readability, maintainability, and adherence to standards.
+`npm run start` serves the production build; run `npm run build` first.
 
-Documentation: inline JSDoc for complex functions; README updates for major changes.
-
-Agile practices: sprint planning, daily standups, retrospectives.
-
-Knowledge sharing: regular demos, pair programming encouraged.
-
-CI/CD: automated linting, testing, and deployment pipelines.
-
-##  Project specification
-Project Specification: InventoryHub
-1. Title & Description
-Title: InventoryHub
-
-Description: A web-based inventory management system built with Next.js (App Router), TypeScript, and Tailwind CSS. Designed for small businesses and organizations to track products, manage stock levels, and streamline record-keeping.
-
-2. Purpose & Target Audience
-Purpose: Improve inventory accuracy, reduce manual record-keeping, and provide real-time visibility into stock levels.
-
-Target Audience:
-
-Employees: Update inventory records.
-
-Administrators: Manage products, categories, and users.
-
-Owners: Monitor inventory status, generate reports, and oversee operations.
-
-3. User Stories & Acceptance Criteria
-Sign Up
-User Story: As a new user, I want to sign up with my email and password so I can access InventoryHub.
-
-Acceptance Criteria:
-
-User can register with email, password, and role (employee/admin/owner).
-
-Password must meet security requirements (min length, complexity).
-
-Create (Add Product)
-User Story: As an administrator, I want to add new products so they can be tracked in the system.
-
-Acceptance Criteria:
-
-Product form includes name, SKU, category, quantity, and price.
-
-Validation ensures required fields are filled.
-
-Product appears in inventory list immediately after creation.
-
-Read (View Inventory)
-User Story: As an employee, I want to view the inventory list so I can check stock levels.
-
-Acceptance Criteria:
-
-Inventory list displays product name, SKU, quantity, and status (in stock, low stock, out of stock).
-
-Search and filter options available.
-
-Update (Edit Product)
-User Story: As an administrator, I want to update product details so inventory stays accurate.
-
-Acceptance Criteria:
-
-Editable fields: name, category, quantity, price.
-
-Changes saved and reflected immediately.
-
-Delete (Remove Product)
-User Story: As an administrator, I want to delete products so outdated items are removed.
-
-Acceptance Criteria:
-
-Delete action requires confirmation.
-
-Deleted products no longer appear in inventory list.
-
-4. API Endpoints
-Endpoint	Method	Description
-/api/auth/signup	POST	Register new user
-/api/auth/login	POST	Authenticate user
-/api/products	GET	Fetch product list
-/api/products/:id	GET	Fetch single product
-/api/products	POST	Create new product
-/api/products/:id	PUT	Update product
-/api/products/:id	DELETE	Delete product
-/api/reports	GET	Generate inventory reports
-
-
-5. Implementation Priority
-Authentication & Authorization
-
-User roles (employee/admin/owner).
-
-Secure login & signup.
-
-Core CRUD for Products
-
-Create, Read, Update, Delete workflows.
-
-Inventory Dashboard
-
-Stock levels, search, filters, pagination.
-
-Audit Logging
-
-Track changes and deletions.
-
-Reports & Analytics
-
-Exportable summaries for owners.
-
-User Management
-
-Admins manage employee accounts.
+## Deployment (Vercel)
+
+1. Import the repository into Vercel.
+2. Set **Root Directory** to `inventoryhub` (the directory containing this `package.json`).
+3. Add `DATABASE_URL` and `AUTH_SECRET` in the Vercel project’s environment variables for the environments you deploy.
+4. Confirm the Neon database has its baseline `users` and `products` tables and that both checked-in migrations have been applied.
+5. Deploy. Vercel uses the Next.js framework settings and the `build` script from `package.json`.
+
+The current live deployment is [inventoryhub-one.vercel.app](https://inventoryhub-one.vercel.app).
+
+## Application routes
+
+| Route | Access | Purpose |
+| --- | --- | --- |
+| `/` | Public | Landing page |
+| `/signup`, `/login` | Public | Account registration and sign-in |
+| `/products` | Employee, Admin | Browse inventory; Admins also get product-management actions |
+| `/products/new`, `/products/[id]/edit` | Admin | Create and update products |
+| `/users`, `/users/new`, `/users/[id]`, `/users/[id]/edit` | Admin | Manage user accounts |
+| `/reports/new`, `/reports/mine` | Employee | Submit stock counts and view their report history |
+| `/reports` | Admin, Owner | Review submitted stock counts |
+| `/owner/dashboard` | Owner | Inventory overview |
+| `/owner/reports/stock-status` | Owner | Stock totals and inventory value |
+| `/owner/reports/low-stock` | Owner | Products below their restock threshold |
+| `/owner/reports/employees` | Owner | Employee directory |
+| `/owner/reports/transaction-history` | Owner | Inventory audit history |
+
+## API routes
+
+These are the implemented HTTP route handlers. Product, user, and stock-report changes are performed through authenticated Next.js Server Actions, not through REST endpoints.
+
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| `/api/auth/signup` | `POST` | Creates a public Employee account. Accepts JSON with `name`, `email`, and `password`. |
+| `/api/auth/[...nextauth]` | `GET`, `POST` | Auth.js v5 handlers for sign-in, sign-out, session, and related authentication actions. The Credentials provider verifies accounts against the existing Neon `users` table. |
+
+## Database behavior
+
+- `public.users` stores account identity, role, and password hash.
+- `public.products` stores product and stock information.
+- `public.inventory_transactions` records inventory changes. Product deletion preserves history and sets the related product reference to `NULL`.
+- `public.employee_stock_reports` stores employee-submitted counts and their review status.
+- Approving a stock report updates the product quantity and records the change in transaction history.
+
+## Verification and known issues
+
+- Before the Auth.js migration, production smoke testing on October 14, 2026 verified sign-up, role-based access, login/logout, and create/read/update/delete flows for users and products. Temporary test users and the temporary product were deleted afterward; the product’s audit-history entry was retained by design.
+- The Auth.js v5 migration was smoke-tested locally on October 14, 2026: Employee, Admin, and Owner sign-in, role redirects, protected routes, and logout passed. Deploy this version and set `AUTH_SECRET` in Vercel before asking graders to test the hosted application.
+- A mobile PageSpeed Insights lab run on October 14, 2026 scored **99 Performance**, **100 Accessibility**, **100 Best Practices**, and **100 SEO** for the live site. [View the report](https://pagespeed.web.dev/analysis/https-inventoryhub-one-vercel-app/1pc2qi03ud?form_factor=mobile). Lab scores can vary between runs and do not replace manual accessibility testing.
+- The repository currently has no automated test script or checked-in baseline schema/seed script. Configure the database and run the migrations before starting a new deployment.
+- Next.js may report a multiple-lockfile/workspace-root warning because the app is in the `inventoryhub/` subdirectory. Keep the Vercel Root Directory set to `inventoryhub` and check the build output if the warning appears.
+- Public sign-up intentionally assigns the Employee role; elevated roles must be provisioned by an Admin.
+- Authentication uses Auth.js v5 with the Credentials provider and JWT sessions; it does not use Auth.js database persistence or Clerk. Set `AUTH_SECRET` locally and in Vercel before signing in. For migration compatibility only, the configuration can fall back to an existing `JWT_SECRET`; prefer setting `AUTH_SECRET`. Existing sessions from the previous custom-cookie implementation are invalidated and users must sign in again.
+
+## Contributors and workflow
+
+The team uses feature branches and pull requests for changes. See the repository’s merged pull-request history for the project workflow.

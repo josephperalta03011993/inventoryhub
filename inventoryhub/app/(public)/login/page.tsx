@@ -1,55 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useActionState } from 'react';
 import Link from 'next/link';
+import { authenticate } from './actions';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [uiError, setUiError] = useState<string | null>(null);
-  const [uiSuccess, setUiSuccess] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setUiError(null);
-    setUiSuccess(null);
-    setIsLoading(true);
-
-    try {
-      //  Points directly to my colocated endpoint handler sitting right next door!
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data: { error?: string; redirectTo?: string } = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Authentication failed.');
-      }
-
-      const redirectTo = data.redirectTo;
-      if (
-        redirectTo !== "/products" &&
-        redirectTo !== "/owner/dashboard" &&
-        redirectTo !== "/"
-      ) {
-        throw new Error("The account does not have a valid destination.");
-      }
-
-      setUiSuccess('Authorized! Access granted.');
-      setTimeout(() => {
-        window.location.assign(redirectTo);
-      }, 600);
-
-    } catch (err: unknown) {
-      setUiError(err instanceof Error ? err.message : 'Network interruption occurred.');
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const [uiError, formAction, isLoading] = useActionState(authenticate, null);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-6 py-12 text-slate-900">
@@ -64,18 +20,16 @@ export default function LoginPage() {
         </div>
 
         {uiError && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{uiError}</div>}
-        {uiSuccess && <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">{uiSuccess}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form action={formAction} className="space-y-4">
           <div>
             <label htmlFor="email-field" className="mb-1.5 block text-sm font-medium text-slate-700">Email</label>
             <input
               id="email-field"
               type="email"
+              name="email"
               required
               disabled={isLoading}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
               placeholder="name@company.com"
             />
@@ -86,10 +40,9 @@ export default function LoginPage() {
             <input
               id="password-field"
               type="password"
+              name="password"
               required
               disabled={isLoading}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
               placeholder="••••••••"
             />

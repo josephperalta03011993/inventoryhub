@@ -207,9 +207,7 @@ An owner/stakeholder needs to view summary reports showing inventory status, tre
 ### Authentication Endpoints
 
 - `POST /api/auth/signup` - Create new user account
-- `POST /api/auth/login` - Authenticate user and create session
-- `POST /api/auth/logout` - End user session
-- `POST /api/auth/refresh-token` - Refresh authentication token
+- `/api/auth/[...nextauth]` - Auth.js v5 handlers for Credentials sign-in, sign-out, and session management
 
 ### Product Endpoints
 

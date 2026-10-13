@@ -1,10 +1,8 @@
-import { cookies } from "next/headers";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { verifySessionToken } from "@/app/lib/auth-utils";
 import { sql } from "@/app/lib/db";
-
-export type UserRole = "Employee" | "Admin" | "Owner";
+import type { UserRole } from "@/app/lib/roles";
 
 export type CurrentUser = {
   id: string;
@@ -15,22 +13,17 @@ export type CurrentUser = {
 const UserRoleSchema = z.enum(["Employee", "Admin", "Owner"]);
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("inventory_session")?.value;
-
-  if (!token) {
-    return null;
-  }
-
-  const session = await verifySessionToken(token);
-  if (!session) {
+  const session = await auth();
+  const userId = session?.user?.id;
+  const sessionRole = UserRoleSchema.safeParse(session?.user?.role);
+  if (!userId || !sessionRole.success) {
     return null;
   }
 
   const rows = await sql`
     SELECT id, email, role
     FROM public.users
-    WHERE id = ${session.id}
+    WHERE id = ${userId}
     LIMIT 1
   `;
   const user = rows[0];
