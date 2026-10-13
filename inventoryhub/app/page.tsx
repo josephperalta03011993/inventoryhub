@@ -22,12 +22,12 @@ export default function HomePage() {
         >
           Log in
         </Link>
-        <Link
+        {/* <Link
           href="/signup"
           className="rounded-lg border border-gray-400 bg-white px-6 py-3 text-sm font-medium text-gray-900 hover:bg-gray-50"
         >
           Create an account
-        </Link>
+        </Link> */}
       </div>
 
       <section aria-labelledby="roles-heading" className="mt-16">
