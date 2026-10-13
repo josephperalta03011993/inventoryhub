@@ -78,7 +78,7 @@ export default async function OwnerDashboardPage() {
       <section>
         <h2 className="mb-4 text-xl font-semibold text-slate-900">Reports</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           <ReportLink
             title="Stock Status"
             description="View overall stock levels and total inventory value."
@@ -88,6 +88,11 @@ export default async function OwnerDashboardPage() {
             title="Low Stock Alerts"
             description="See all products below their restock threshold."
             href="/owner/reports/low-stock"
+          />
+          <ReportLink
+            title="Employees"
+            description="Review employee accounts and registration dates."
+            href="/owner/reports/employees"
           />
           <ReportLink
             title="Transaction History"

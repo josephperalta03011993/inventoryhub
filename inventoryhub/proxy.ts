@@ -43,9 +43,21 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  if (pathname.startsWith("/reports")) {
+    const reportPath = pathname.replace(/\/+$/, "") || "/";
+    if (role === "Employee") {
+      if (reportPath !== "/reports/new" && reportPath !== "/reports/mine") {
+        return NextResponse.redirect(new URL("/products", request.url));
+      }
+    } else if (reportPath !== "/reports") {
+      const destination = role === "Owner" ? "/owner/dashboard" : "/products";
+      return NextResponse.redirect(new URL(destination, request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/products/:path*", "/owner/:path*", "/users/:path*"],
+  matcher: ["/products/:path*", "/owner/:path*", "/users/:path*", "/reports/:path*"],
 };
